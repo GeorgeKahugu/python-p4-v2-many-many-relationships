@@ -3,7 +3,7 @@
 
 import datetime
 from app import app
-from models import db, Employee, Meeting, Project
+from models import db, Employee, Meeting, Project, employee_meetings, Assignment
 
 with app.app_context():
 
@@ -11,6 +11,8 @@ with app.app_context():
     Employee.query.delete()
     Meeting.query.delete()
     Project.query.delete()
+    db.session.query(employee_meetings).delete()
+    db.session.query(Assignment).delete()
 
     # Add employees
     e1 = Employee(name="Uri Lee", hire_date=datetime.datetime(2022, 5, 17))
@@ -33,11 +35,22 @@ with app.app_context():
     db.session.commit()
 
     # Add projects
-    p1 = Project(title="XYZ Project Flask server",  budget=50000)
+    p1 = Project(title="XYZ Project Flask server", budget=50000)
     p2 = Project(title="XYZ Project React UI", budget=100000)
     db.session.add_all([p1, p2])
     db.session.commit()
 
     # Many-to-many relationship between employee and meeting
+    e1.meetings.append(m1)
+    e1.meetings.append(m2)
+    m2.employees.append(e2)
+    m2.employees.append(e3)
+    m2.employees.append(e4)
+    db.session.commit()
 
-    # Many-to-many relationship between employee and project through assignment
+    # Many-to-many relationship between employee and project
+    p1.employees.append(e1)
+    p1.employees.append(e2)
+    p2.employees.append(e3)
+    p2.employees.append(e4)
+    db.session.commit()
